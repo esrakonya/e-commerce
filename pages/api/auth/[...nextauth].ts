@@ -1,11 +1,11 @@
-import NextAuth from "next-auth/next"
+import NextAuth, { AuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { PrismaClient } from "@prisma/client"
 import prisma from "@/libs/prismadb"
 import CredentialsProvider from "next-auth/providers/credentials"
-import bcrypt from 'bcrypt'
-import { AuthOptions } from "next-auth"
+import bcrypt from "bcrypt"
+
 
 
 export const authOptions: AuthOptions = {
@@ -18,11 +18,11 @@ export const authOptions: AuthOptions = {
         CredentialsProvider({
             name: "credentials",
             credentials: {
-                email: { label: "Email", type: "email" },
+                email: { label: "Email", type: "text" },
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials, req) {
-                if(!credentials?.email || !credentials?.password) {
+                if(!credentials?.email || !credentials.password){
                     throw new Error('Geçersiz email ya da şifre!')
                 }
                 const user = await prisma.user.findUnique({
@@ -31,13 +31,13 @@ export const authOptions: AuthOptions = {
                     }
                 })
 
-                if(!user || !user.hashedPassword) {
+                if(!user || !user.hashedPassword){
                     throw new Error('Geçersiz')
                 }
 
-                const comparePassword = await bcrypt.compare(credentials.password, user.hashedPassword)
+                const comparePassword = bcrypt.compare(credentials.password, user.hashedPassword)
 
-                if(!comparePassword) {
+                if(!comparePassword){
                     throw new Error('Yanlış şifre!')
                 }
 
