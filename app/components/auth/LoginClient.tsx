@@ -10,13 +10,15 @@ import { signIn } from "next-auth/react"
 import { useRouter } from 'next/navigation'
 import toast from "react-hot-toast"
 import { User } from "@prisma/client"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import { SafeUser } from "@/types"
 
 interface LoginClientProps{
-    currentUser: User | null | undefined
+    currentUser: SafeUser | null
 }
 const LoginClient:React.FC<LoginClientProps> = ({currentUser}) => {
     const router = useRouter()
+    const [isLoading, setIsLoading] = useState(false)
     const {
         register,
         handleSubmit,
@@ -25,10 +27,12 @@ const LoginClient:React.FC<LoginClientProps> = ({currentUser}) => {
     } = useForm<FieldValues>()
 
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
+        setIsLoading(true)
         signIn('credentials', {
             ...data,
             redirect: false
         }).then((callback) => {
+            setIsLoading(false)
             if(callback?.ok) {
                 router.push('/cart')
                 router.refresh()
@@ -47,6 +51,10 @@ const LoginClient:React.FC<LoginClientProps> = ({currentUser}) => {
             router.refresh()
         }
     }, [])
+
+    if(currentUser) {
+        return <p className="text-center">Giriş yapıldı. Yönlendiriliyorsunuz...</p>
+    }
 
     return (
         <AuthContainer>

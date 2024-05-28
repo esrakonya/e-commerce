@@ -22,6 +22,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Toaster
+          toastOptions={{
+            style:{
+              background: 'rgb(51 65 85)',
+              color: '#fff'
+            }
+          }}
           position='top-right'
           reverseOrder={false}
         />

@@ -6,12 +6,15 @@ import toast from "react-hot-toast";
 
 interface CartContextProps {
     productCartQty: number
+    cartTotalAmount: number
     cartPrdcts: CardProductProps[] | null
     addToBasket: (product: CardProductProps) => void
     addToBasketIncrease: (product: CardProductProps) => void
     addToBasketDecrease: (product: CardProductProps) => void
     removeFromCart: (product: CardProductProps) => void
     removeCart: () => void
+    paymentIntent: string | null
+    handleSetPaymentIntent: (val: string | null) => void
 }
 
 const CartContext = createContext<CartContextProps | null>(null)
@@ -23,13 +26,42 @@ interface Props {
 
 export const CartContextProvider = (props: Props) => {
     const [productCartQty, setProductCartQty] = useState(0)
+    const [cartTotalAmount, setCartTotalAmount] = useState(0)
     const [cartPrdcts, setCartPrdcts] = useState<CardProductProps[] | null>(null)
+    const [paymentIntent, setPaymentIntent] = useState<string | null>(null)
 
     useEffect(() => {
-        let getItem: any = localStorage.getItem('cart')
+        let getItem: any = localStorage.getItem('MercaturaCartItems')
         let getItemParse: CardProductProps[] | null = JSON.parse(getItem)
+        const mercaturaPaymentIntent: any = localStorage.getItem('mercaturaPaymentIntent')
+        const paymentIntent: string | null = JSON.parse(mercaturaPaymentIntent)
         setCartPrdcts(getItemParse)
+        setPaymentIntent(paymentIntent)
     }, [])
+
+    useEffect(() => {
+        const getTotals = () => {
+            if(cartPrdcts){
+                const { total, qty } = cartPrdcts?.reduce(
+                    (acc, item) => {
+                        const itemTotal = item.price * item.quantity
+        
+                        acc.total += itemTotal
+                        acc.qty += item.quantity
+        
+                        return acc
+                    },
+                    {
+                        total: 0,
+                        qty: 0,
+                    }
+                )
+                setProductCartQty(qty)
+                setCartTotalAmount(total)
+            }
+        }
+        getTotals()
+    }, [cartPrdcts])
 
     const addToBasketIncrease = useCallback((product: CardProductProps) => {
         let updatedCart;
@@ -44,7 +76,7 @@ export const CartContextProvider = (props: Props) => {
                 updatedCart[existingItem].quantity = ++updatedCart[existingItem].quantity //önceki değerinden bir fazla 
             }
             setCartPrdcts(updatedCart)
-            localStorage.setItem('cart', JSON.stringify(updatedCart))
+            localStorage.setItem('MercaturaCartItems', JSON.stringify(updatedCart))
         }
     }, [cartPrdcts])
 
@@ -61,14 +93,14 @@ export const CartContextProvider = (props: Props) => {
                 updatedCart[existingItem].quantity = --updatedCart[existingItem].quantity
             }
             setCartPrdcts(updatedCart)
-            localStorage.setItem('cart', JSON.stringify(updatedCart))
+            localStorage.setItem('MercaturaCartItems', JSON.stringify(updatedCart))
         }
     }, [cartPrdcts])
 
     const removeCart = useCallback(() => {
         setCartPrdcts(null)
         toast.success('Sepet Temizlendi')
-        localStorage.setItem('cart', JSON.stringify(null))
+        localStorage.setItem('MercaturaCartItems', JSON.stringify(null))
     }, [])
 
     const addToBasket = useCallback((product: CardProductProps) => {
@@ -80,7 +112,7 @@ export const CartContextProvider = (props: Props) => {
                 updatedCart = [product]
             }
             toast.success('Ürün Sepete Eklendi')
-            localStorage.setItem('cart', JSON.stringify(updatedCart))
+            localStorage.setItem('MercaturaCartItems', JSON.stringify(updatedCart))
             return updatedCart
         })
     }, [cartPrdcts])
@@ -91,18 +123,26 @@ export const CartContextProvider = (props: Props) => {
 
             setCartPrdcts(filteredProducts)
             toast.success('Ürün Sepetten Silindi')
-            localStorage.setItem('cart', JSON.stringify(filteredProducts))
+            localStorage.setItem('MercaturaCartItems', JSON.stringify(filteredProducts))
         }
     }, [cartPrdcts])
 
+    const handleSetPaymentIntent = useCallback((val: string | null) => {
+        setPaymentIntent(val)
+        localStorage.setItem('mercaturaPaymentIntent', JSON.stringify(val))
+    }, [paymentIntent])
+
     let value = {
         productCartQty,
+        cartTotalAmount,
         addToBasket,
         cartPrdcts,
         removeFromCart,
         removeCart,
         addToBasketIncrease,
-        addToBasketDecrease
+        addToBasketDecrease,
+        paymentIntent,
+        handleSetPaymentIntent,
     }
     return (
         <CartContext.Provider value={value} {...props} />

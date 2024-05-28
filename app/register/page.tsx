@@ -1,13 +1,16 @@
 import React from 'react'
 import RegisterClient from '../components/auth/RegisterClient'
 import { getCurrentUser } from '../actions/getCurrentUser'
+import PageContainer from '../components/containers/PageContainer'
 
 const Register = async () => {
   const currentUser = await getCurrentUser()
   return (
-    <div>
+    <PageContainer>
+      <div>
         <RegisterClient currentUser={currentUser} />
-    </div>
+      </div>
+    </PageContainer>
   )
 }
 

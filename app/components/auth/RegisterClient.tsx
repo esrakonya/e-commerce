@@ -13,9 +13,10 @@ import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { User } from "@prisma/client"
 import { useEffect } from "react"
+import { SafeUser } from "@/types"
 
 interface RegisterClientProps{
-    currentUser: User | null | undefined
+    currentUser: SafeUser | null | undefined
 }
 
 const RegisterClient:React.FC<RegisterClientProps> = ({currentUser}) => {
@@ -46,7 +47,7 @@ const RegisterClient:React.FC<RegisterClientProps> = ({currentUser}) => {
                 if(callback?.error) {
                     toast.error(callback.error)
                 }
-            })
+            }).catch(() => toast.error("Bir şeyler yanlış gitti"))
         })
     }
 
@@ -56,6 +57,10 @@ const RegisterClient:React.FC<RegisterClientProps> = ({currentUser}) => {
             router.refresh()
         }
     }, [])
+
+    if(currentUser){
+        return <p className="text-center">Giriş yapıldı. Yönlendiriliyorsunuz...</p>
+    }
 
     return (
         <AuthContainer>

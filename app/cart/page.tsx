@@ -1,10 +1,12 @@
+import { getCurrentUser } from "../actions/getCurrentUser"
 import CartClient from "../components/cart/CartClient"
 
 
-const Cart = () => {
+const Cart = async () => {
+    const currentUser = await getCurrentUser()
     return (
-        <div>
-            <CartClient />
+        <div className="pt-8">
+            <CartClient currentUser={currentUser} />
         </div>
     )
 }

@@ -11,8 +11,8 @@ interface AdminSidebarItemProps{
 
 const AdminSidebarItem:React.FC<AdminSidebarItemProps> = ({selected, name, icon:Icon, url}) => {
     return (
-        <Link className={`cursor-pointer flex itrms-center gap-2 ${selected ? "text-black font-bold" : "text-slate-500 font-medium" }`} href={url}>
-            <Icon size={"25"} />
+        <Link className={`cursor-pointer flex items-center gap-2 ${selected ? "text-slate-800 font-bold" : "text-white font-medium" }`} href={url}>
+            <Icon size={"20"} />
             <div>{name}</div>
         </Link>
     )

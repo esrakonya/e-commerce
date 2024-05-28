@@ -4,7 +4,9 @@ import CardCount from './CardCount'
 import HamburgerMenu from './HamburgerMenu'
 import Search from './Search'
 import { getCurrentUser } from '@/app/actions/getCurrentUser'
-import User from './User'
+import User from './UserMenu'
+import UserMenu from './UserMenu'
+import Categories from '../home/Categories'
 
 const Navbar = async () => {
   const currentUser = await getCurrentUser()
@@ -13,7 +15,7 @@ const Navbar = async () => {
         <Logo/>
         <Search/>
         <CardCount/>
-        <User currentUser={currentUser} />
+        <UserMenu currentUser={currentUser} />
         <HamburgerMenu/>
     </div>
   )

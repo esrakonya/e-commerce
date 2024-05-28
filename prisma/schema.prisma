@@ -34,7 +34,7 @@ model Product {
   brand         String
   category      String
   inStock       Boolean
-  image         String
+  images        String
   reviews       Review[]
 }
 
@@ -59,11 +59,55 @@ model User {
   image         String?
   hashedPassword String?
   createdAt     DateTime  @default(now())
-  updateAt     DateTime  @updatedAt
+  updateAt     DateTime?  @updatedAt
   role          Role      @default(USER)
 
   accounts      Account[]
   reviews       Review[]
+  orders        Order[]
+}
+
+model Order{
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String    @db.ObjectId
+  amount       Float
+  currency     String
+  status       String
+  deliveryStatus String?
+  createDate   DateTime @default(now())
+  paymentIntentId  String @unique
+  products     CartProductProps[]
+  address      Address?
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+}
+
+type CartProductProps{
+  id String
+  name String
+  description String
+  category String
+  price Float
+  quantity Int
+  image String
+  inStock Boolean
+}
+
+// model Image {
+//   id         String   @id @default(auto()) @map("_id") @db.ObjectId
+//   url        String
+//   productId  String   @db.ObjectId
+//   product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+// }
+
+type Address{
+  city String
+  country String
+  line1 String
+  line2 String?
+  posta1_code String
+  state String
 }
 
 enum Role {

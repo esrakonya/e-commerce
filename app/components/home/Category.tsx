@@ -1,27 +1,57 @@
 "use client"
 
-const Category = () => {
-    const categoryList = [
-        {
-            name: "Ayakkabı"
-        },
-        {
-            name: "Ayakkabı"
-        },
-        {
-            name: "Ayakkabı"
-        },
-        {
-            name: "Ayakkabı"
-        },
-    ]
-  return (
-    <div className="flex items-center justify-center px:3 md:px:10 gap-3 md:gap-10 py-5 md:py-8 overflow-x-auto">
-        {
-            categoryList.map((category, index) => (
-                <div className="border text-slate-900 rounded-full min-w-[120px] flex items-center justify-center cursor-pointer flex-1 px-3 py-2 text-center" key={index}>{category.name}</div>
-            ))
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
+import { IconType } from "react-icons";
+import queryString from 'query-string'
+
+interface CategoryProps{
+    text: string;
+    icon: IconType;
+    selected?: boolean
+}
+
+const Category:React.FC<CategoryProps> = ({text, icon:Icon, selected}) => {
+    const router = useRouter()
+    const params = useSearchParams()
+
+
+    const handleClick = useCallback(() => {
+        if(text === "All"){
+            router.push('/')
+        }else{
+            let currentQuery = {}
+
+            if(params){
+                currentQuery = queryString.parse(params.toString())
+            }
+
+            const updatedQuery:any = {
+                ...currentQuery,
+                category: text
+            }
+
+            const url = queryString.stringifyUrl(
+                {
+                    url: '/',
+                    query: updatedQuery
+                },
+                {
+                    skipNull: true
+                }
+            )
+
+            router.push(url)
         }
+    }, [text, params, router])
+  return (
+    <div onClick={handleClick} className={`flex items-center justify-center text-center 
+     p-2 border-b-2 hover:text-slate-900 transition cursor-pointer
+    ${selected ? 'border-b-slate-800 text-slate-900' : 'border-transparent text-slate-600'}`}>
+        <div className="flex gap-2 px-3">
+            <Icon size={20} />
+            <div className="font-medium text-sm">{text}</div>
+        </div>
     </div>
   )
 }

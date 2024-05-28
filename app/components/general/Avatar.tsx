@@ -2,11 +2,13 @@ import { RxAvatar } from "react-icons/rx";
 import React from 'react'
 
 interface AvatarProps {
-    image?: string
+    src?: string | null | undefined 
 }
 
-const Avatar:React.FC<AvatarProps> = ({image}) => {
-  if(image) return <img src={image} alt=""/>
+const Avatar:React.FC<AvatarProps> = ({src}) => {
+  if(src){
+    <img src={src} alt="Avatar" className="rounded-full" height={25} width={25} />
+  }
   return <div><RxAvatar size="20"/></div>
 }
 

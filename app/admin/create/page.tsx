@@ -1,8 +1,21 @@
+import { getCurrentUser } from "@/app/actions/getCurrentUser"
+import WarningText from "@/app/components/WarningText";
+import CreateForm from "@/app/components/admin/CreateForm";
+import PageContainer from "@/app/components/containers/PageContainer";
 
 
-const CreateProduct = () => {
+const CreateProduct = async () => {
+    const currentUser =  await getCurrentUser();
+
+    if(!currentUser || currentUser.role !== "ADMIN"){
+        return (
+            <WarningText text="Bu sayfaya erişimin yasak!" />
+        )
+    }
     return (
-        <div>Create Product</div>
+        <PageContainer>
+            <CreateForm />
+        </PageContainer>
     )
 }
 
